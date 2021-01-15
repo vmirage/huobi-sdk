@@ -1,6 +1,7 @@
 # node-huobi-sdk
 
-> 本SDK为[huobi](https://www.huobi.pro/zh-cn)的[官方API](https://github.com/huobiapi/API_Docs/wiki/REST_api_reference)的ts封装。
+> 本SDK为[huobi](https://www.huobi.pro/zh-cn)的[官方API](https://github.com/huobiapi/API_Docs/wiki/REST_api_reference)的ts封装。集成REST API、WebScoket行情和WebScoket账户交易V2版
+
 
 ### Install
 
@@ -34,10 +35,17 @@ const hbsdk = new HuobiSDK({
     }
 });
 
-// 需要先执行
+// 需要先执行(只需执行一次)，才能调用钱包，下单等接口
 hbsdk.getAccountId().then(() => {
-    hbsdk.getAccountBalance(data => console.log(data.list));
+
 });
+
+// 查余额
+hbsdk.getAccountBalance(data => console.log(data.list));
+
+// 下单
+hbsdk.order('btcusdt', 'buy-limit', 0.001, 38000);
+
 
 // 行情-深度
 hbsdk.subMarketDepth({symbol: SYMBOL}, (data) => console.log(data))
