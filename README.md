@@ -22,12 +22,12 @@ const ACCOUNT_WS =  'wss://api.huobi.de.com/ws/v2';
 const hbsdk = new HuobiSDK({
     accessKey: "access_key",
     secretKey: "secret_key",
-    errLogger: (msg) => {
-        // errLogger.error(msg);
-    },
-    outLogger: (msg) => {
-        // outLogger.info(msg);
-    },
+    // errLogger: (msg) => {
+    //     errLogger.error(msg);
+    // },
+    // outLogger: (msg) => {
+    //     outLogger.info(msg);
+    // },
     url:{
         rest: REST_URL,
         market_ws: MARKET_WS,
