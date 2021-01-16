@@ -116,13 +116,18 @@ export class HuobiSDKBase extends EventEmitter {
             });
     }
     request = <T>(path: string, options: HttpOptions): Promise<T> => {
-
+        if (!this.options.url.rest) {
+            return Promise.reject('未设置options.url.rest')
+        }
         return this._request<T>(`${this.options.url.rest}${path}`, options);
     }
     auth_get = <T = any>(
         path: string,
         params: Record<string, any> = {} as Record<string, any>
     ) => {
+        if (!this.options.url.rest) {
+            return Promise.reject('未设置options.url.rest')
+        }
         const PATH = `${this.options.url.rest}${path}`;
         const { accessKey, secretKey } = this.options;
 
