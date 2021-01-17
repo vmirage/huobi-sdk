@@ -57,6 +57,7 @@ hbsdk.subMarketTrade({symbol: SYMBOL}, (data) => console.log(data))
 // 需要先执行
 hbsdk.subAuth((data) => {
     console.log(data)
+    // 订阅账户变化
     hbsdk.subAccountsUpdate({}, (data) => {
         console.log(data)
     });
