@@ -226,13 +226,13 @@ export class HuobiSDKBase extends EventEmitter {
 
         switch(channel) {
             case 'depth':
-                this.emit('market.depth', commonData);
+                this.emit(`market.depth.${symbol}`, commonData);
                 break;
             case 'kline':
-                this.emit('market.kline', commonData);
+                this.emit(`market.kline.${symbol}`, commonData);
                 break;
             case 'trade':
-                this.emit('market.trade', commonData);
+                this.emit(`market.trade.${symbol}`, commonData);
                 break;
             default: return;
         }

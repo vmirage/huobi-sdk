@@ -12,28 +12,24 @@ export interface BalanceItem{
 }
 
 export interface SymbolInfo {
-    'base-currency': string;
-    'quote-currency': string;
-    'price-precision': number;
-    'amount-precision': number;
-    'symbol-partition': string;
-    'value-precision': number;
-    'min-order-amt': number;
-    'max-order-amt': number;
-    'min-order-value': number;
-    'leverage-ratio': number;
-    'limit-order-min-order-amt': number;
-    'limit-order-max-order-amt': number;
-    'sell-market-min-order-amt': number;
-    'sell-market-max-order-amt': number;
-    'buy-market-max-order-value': number;
-    'max-order-value': number;
-    'mgmt-fee-rate': number;
-    'charge-time': string;
-    'rebal-time': string;
-    'rebal-threshold': number;
-    'init-nav': number;
-  }
+  'base-currency': string;
+  'quote-currency': string;
+  'price-precision': number;
+  'amount-precision': number;
+  'symbol-partition': string;
+  symbol: string;
+  state: string;
+  'value-precision': number;
+  'min-order-amt': number;
+  'max-order-amt': number;
+  'min-order-value': number;
+  'limit-order-min-order-amt': number;
+  'limit-order-max-order-amt': number;
+  'sell-market-min-order-amt': number;
+  'sell-market-max-order-amt': number;
+  'buy-market-max-order-value': number;
+  'api-trading': string;
+}
   export interface ContractInfo {
     "symbol": string,
     "contract_code": string,

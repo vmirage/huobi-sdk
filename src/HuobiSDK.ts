@@ -59,18 +59,26 @@ export class HuobiSDK extends HuobiSDKBase{
                         (this.market_cache_ws as any).reStart();
                     });
                 }
-                this.on('market_ws.open', () => {
+                if (market_ws.isOpen()) {
                     resolve(this[type] || HuobiSDKBase[type]);
-                });
+                } else {
+                    this.on('market_ws.open', () => {
+                        resolve(this[type] || HuobiSDKBase[type]);
+                    });
+                }
             }
             if (this['account_cache_ws'] === undefined || this['account_ws'] === undefined) {
                 const account_ws = this.createAccountWS();
                 if (this.account_cache_ws === undefined) {
                     this.account_cache_ws = new CacheSockett(account_ws);
                 }
-                this.on('account_ws.open', () => {
+                if (account_ws.isOpen()) {
                     resolve(this[type]  || HuobiSDKBase[type]);
-                });
+                } else {
+                    this.on('account_ws.open', () => {
+                        resolve(this[type]  || HuobiSDKBase[type]);
+                    });
+                }
             }
             // if (this[type] === undefined && HuobiSDKBase[type]) {
             //     reject(`${type} 不存在`);
@@ -205,7 +213,7 @@ export class HuobiSDK extends HuobiSDKBase{
         if (!market_cache_ws.hasCache(subMessage)) {
             market_cache_ws.sub(subMessage, id);
         }
-        this.addEvent('market.depth', subscription);
+        this.addEvent(`market.depth.${symbol}`, subscription);
     }
     async subMarketKline({symbol, period, id}: {symbol: string, period: CandlestickIntervalEnum, id?: string}, subscription?: (data: MarketMessageData) => void) {
         const subMessage = WS_SUB.kline(symbol, period);
@@ -213,7 +221,7 @@ export class HuobiSDK extends HuobiSDKBase{
         if (!market_cache_ws.hasCache(subMessage)) {
             market_cache_ws.sub(subMessage, id);
         }
-        this.addEvent('market.kline', subscription);
+        this.addEvent(`market.kline.${symbol}`, subscription);
     }
     async subMarketTrade({symbol, id}: {symbol: string, id?: string}, subscription?: (data: MarketMessageData) => void) {
         const subMessage = WS_SUB.tradeDetail(symbol);
@@ -221,7 +229,7 @@ export class HuobiSDK extends HuobiSDKBase{
         if (!market_cache_ws.hasCache(subMessage)) {
             market_cache_ws.sub(subMessage, id);
         }
-        this.addEvent('market.trade', subscription);
+        this.addEvent(`market.trade.${symbol}`, subscription);
     }
 
     async subAuth(subscription?: (data: Record<string, any>) => void) {
