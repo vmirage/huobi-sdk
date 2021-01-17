@@ -13,7 +13,7 @@ npm install node-huobi-sdk
 ### Usage
 
 ```ts
-import HuobiSDK from 'node-huobi-sdk';
+import HuobiSDK, { CandlestickIntervalEnum } from 'node-huobi-sdk';
 
 const REST_URL =  'https://api.huobi.de.com';
 const MARKET_WS =  'wss://api.huobi.de.com/ws';
