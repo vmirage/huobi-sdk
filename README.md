@@ -66,7 +66,7 @@ hbsdk.subAuth((data) => {
 
 ### Progress
 
-- [ ] Rest
+- [ ] REST
     - [x] `market`：行情
     - [x] `common`：公共
     - [x] `account`：账户
@@ -74,7 +74,7 @@ hbsdk.subAuth((data) => {
     - [ ] `margin`：借贷
     - [ ] `dw`：虚拟币提现
 
-- [ ] ws
+- [ ] WS
     - [x] `kline`
     - [x] `depth`
     - [x] `trade detail`
