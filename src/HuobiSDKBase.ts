@@ -105,14 +105,14 @@ export class HuobiSDKBase extends EventEmitter {
                     if (json.status === "ok") {
                         return json.data || json;
                     } else {
-                        this.errLogger(options.method as string, "-", path, "服务错误", json['err-msg']);
+                        this.errLogger(options.method as string, "-", path, json['err-msg']);
                     }
                 } catch (error) {
-                    this.errLogger(options.method as string, "-", path, "解析异常", error);
+                    this.errLogger(options.method as string, "-", path, "Parse Error", error);
                 }
             })
             .catch(err => {
-                this.errLogger(options.method as string, "-", path, "异常", err);
+                this.errLogger(options.method as string, "-", path, err);
             });
     }
     request = <T>(path: string, options: HttpOptions): Promise<T> => {

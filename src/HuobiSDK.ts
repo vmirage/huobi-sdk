@@ -52,9 +52,9 @@ export class HuobiSDK extends HuobiSDKBase{
                 const market_ws = this.createMarketWS();
                 if (this.market_cache_ws == undefined) {
                     this.market_cache_ws = new CacheSockett(market_ws);
-                    this.market_cache_ws.ws.on('error', () => {
-                        (this.market_cache_ws as any).reStart();
-                    });
+                    // this.market_cache_ws.ws.on('error', () => {
+                    //     (this.market_cache_ws as any).reStart();
+                    // });
                     this.market_cache_ws.ws.on('close', () => {
                         (this.market_cache_ws as any).reStart();
                     });
