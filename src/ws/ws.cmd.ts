@@ -1,4 +1,5 @@
 
+
 import { signature } from '../utils/signature';
 import { Period } from '../interface'
 import { CandlestickIntervalEnum } from '../constant';
@@ -10,7 +11,7 @@ export const WS_SUB = {
      * k线订阅
      * @param param0
      */
-    kline (symbol: string, period: CandlestickIntervalEnum) {
+    kline (symbol: string, period: CandlestickIntervalEnum | Period) {
         return {
             "sub": `market.${symbol}.kline.${period}`,
             "id": `sub_${symbol}_${period}`
@@ -59,7 +60,7 @@ export const WS_REQ = {
      * 请求 KLine 数据
      * @param param0
      */
-    kline (symbol: string, period: Period = '1min') {
+    kline (symbol: string, period: (Period | CandlestickIntervalEnum) = '1min') {
         return {
             "req": `market.${symbol}.kline.${period}`,
             "id": `req_${symbol}_${period}`

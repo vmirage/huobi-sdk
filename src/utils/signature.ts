@@ -3,8 +3,6 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc'
 import url from 'url';
 
-dayjs.extend(utc)
-
 /**
  * 签名计算
  * @param method
@@ -44,11 +42,11 @@ export function signatureSHA(
 }
 /**
  * 鉴权v2
- * @param method 
- * @param fullURL 
- * @param access_key 
- * @param secretKey 
- * @param data 
+ * @param method
+ * @param fullURL
+ * @param access_key
+ * @param secretKey
+ * @param data
  */
 export function signature(
     method: 'GET' | 'POST',

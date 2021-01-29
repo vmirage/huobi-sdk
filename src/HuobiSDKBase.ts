@@ -272,7 +272,7 @@ export class HuobiSDKBase extends EventEmitter {
                 this.errLogger(`account_ws closed:`, 'connect ECONNREFUSED');
             }
             else {
-                this.errLogger(`account_ws closed:`, e.reason);
+                this.errLogger(`account_ws closed:`, e.reason || e);
             }
         });
         HuobiSDKBase.account_ws.on('error', (e) => {

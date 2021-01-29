@@ -95,7 +95,7 @@ export class HuobiSDK extends HuobiSDKBase{
         });
     }
 
-    getMarketHistoryKline(symbol: string, period?: Period, size?: number) {
+    getMarketHistoryKline(symbol: string, period?: Period | CandlestickIntervalEnum, size?: number) {
         const path = `/market/history/kline`;
         return this.request<Record<string, any>[]>(`${path}`, {
             method: 'GET',
@@ -215,7 +215,7 @@ export class HuobiSDK extends HuobiSDKBase{
         }
         this.addEvent(`market.depth.${symbol}`, subscription);
     }
-    async subMarketKline({symbol, period, id}: {symbol: string, period: CandlestickIntervalEnum, id?: string}, subscription?: (data: MarketMessageData) => void) {
+    async subMarketKline({symbol, period, id}: {symbol: string, period: CandlestickIntervalEnum | Period, id?: string}, subscription?: (data: MarketMessageData) => void) {
         const subMessage = WS_SUB.kline(symbol, period);
         const market_cache_ws = await this.getSocket('market_cache_ws');
         if (!market_cache_ws.hasCache(subMessage)) {
