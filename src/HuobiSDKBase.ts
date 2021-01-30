@@ -202,7 +202,7 @@ export class HuobiSDKBase extends EventEmitter {
                 this.errLogger(`market_ws closed:`, 'connect ECONNREFUSED');
             }
             else {
-                this.errLogger(`market_ws closed:`, e.reason);
+                this.errLogger(`market_ws closed:`, e.reason || e);
             }
         });
         HuobiSDKBase.market_ws.on('error', (e) => {
