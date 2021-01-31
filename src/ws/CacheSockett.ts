@@ -8,13 +8,14 @@ export class CacheSockett{
     }
     reStart(ws = this.ws) {
         this.ws = ws;
-        ws.open()
+        ws.open();
         ws.on('open', () => {
             const list = Object.keys(this.cache);
             list.forEach((str) => {
-                this.ws.json(JSON.parse(str))
-            })
-        })
+                this.ws.json(JSON.parse(str));
+            });
+            // this.cache = {};
+        });
     }
     checkCache() {
         if (!this.cache) {

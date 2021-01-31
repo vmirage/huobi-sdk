@@ -214,7 +214,7 @@ export class HuobiSDKBase extends EventEmitter {
         if(!msg.ch) {
             return;
         }
-        const [type, symbol, channel] = msg.ch.split('.');
+        const [type, symbol, channel, other] = msg.ch.split('.');
         const commonData = {
             data: {
                 ...msg.tick,
@@ -226,13 +226,13 @@ export class HuobiSDKBase extends EventEmitter {
 
         switch(channel) {
             case 'depth':
-                this.emit(`market.depth.${symbol}`, commonData);
+                this.emit(`market.${symbol}.depth.${other}`, commonData);
                 break;
             case 'kline':
-                this.emit(`market.kline.${symbol}`, commonData);
+                this.emit(`market.${symbol}.kline.${other}`, commonData);
                 break;
             case 'trade':
-                this.emit(`market.trade.${symbol}`, commonData);
+                this.emit(`market.${symbol}.trade.${other}`, commonData);
                 break;
             default: return;
         }
