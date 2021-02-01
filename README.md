@@ -120,7 +120,7 @@ hbsdk.setOptions({
 - contractOpenInterest [获取当前可用合约总持仓量](https://huobiapi.github.io/docs/dm/v1/cn/#e30aaa2765)
 - contractAccountInfo [获取合约用户账户信息](https://huobiapi.github.io/docs/dm/v1/cn/#e807c44c06)
 
-
+- --
 - subMarketDepth [订阅市场深度行情数据](https://huobiapi.github.io/docs/spot/v1/cn/#8742b7d9f7)
 - subMarketKline [订阅K线](https://huobiapi.github.io/docs/spot/v1/cn/#k-2)
 - subMarketTrade [订阅成交明细](https://huobiapi.github.io/docs/spot/v1/cn/#56c6c47284-2)
