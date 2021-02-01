@@ -28,11 +28,11 @@ const ACCOUNT_WS =  'wss://api.huobi.de.com/ws/v2';
 const hbsdk = new HuobiSDK({
     accessKey: "access_key",
     secretKey: "secret_key",
-    // errLogger: (msg) => {
-    //     errLogger.error(msg);
+    // errLogger: (...msg) => {
+    //     errLogger.error(...msg);
     // },
-    // outLogger: (msg) => {
-    //     outLogger.info(msg);
+    // outLogger: (...msg) => {
+    //     outLogger.info(...msg);
     // },
     url:{
         rest: REST_URL,
@@ -86,11 +86,11 @@ const hbsdk = new HuobiSDK();
 hbsdk.setOptions({
     accessKey: 'account.access_key',
     secretKey: 'account.secret_key',
-    // errLogger: (msg) => {
-    //     errLogger.error(msg);
+    // errLogger: (...msg) => {
+    //     errLogger.error(...msg);
     // },
-    // outLogger: (msg) => {
-    //     outLogger.info(msg);
+    // outLogger: (...msg) => {
+    //     outLogger.info(...msg);
     // },
     url:{
         rest: REST_URL,
