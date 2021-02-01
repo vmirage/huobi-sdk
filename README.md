@@ -35,7 +35,7 @@ const hbsdk = new HuobiSDK({
     }
 });
 
-// 需要先执行(只需执行一次)，才能调用钱包，下单等接口
+// 需要先执行(只需执行一次)，才能调用 钱包、下单 等接口
 hbsdk.getAccountId().then(() => {
 
 });
@@ -54,7 +54,7 @@ hbsdk.subMarketKline({symbol: SYMBOL, period: CandlestickIntervalEnum.MIN1}, (da
 // 行情-交易记录
 hbsdk.subMarketTrade({symbol: SYMBOL}, (data) => console.log(data))
 
-// 需要先执行
+// 需要权鉴才能ws订阅账户、订单变化
 hbsdk.subAuth((data) => {
     console.log(data)
     // 订阅账户变化
@@ -75,10 +75,12 @@ hbsdk.subAuth((data) => {
     - [ ] `dw`：虚拟币提现
 
 - [ ] WS
-    - [x] `kline`
-    - [x] `depth`
-    - [x] `trade detail`
-    - [ ] `market detail`
+    - [x] `account`：账户
+    - [x] `kline`：K线
+    - [x] `depth`：挂单深度
+    - [x] `trade detail`：交易详情
+    - [ ] `market detail`：交易聚合
+    - [ ] `order`： 订单
 
 
 ### LICENSE
