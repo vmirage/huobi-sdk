@@ -34,6 +34,7 @@ export class CacheSockett{
             setTimeout(() => {
                 this.reStart();
             }, 1000);
+            return;
         }
         setTimeout(() => {
             this.checkLive();
