@@ -62,6 +62,7 @@ export class HuobiSDKBase extends EventEmitter {
     static account_ws_status?: 'creating' | 'created'
 
     options: Required<HuobiSDKBaseOptions> = {} as Required<HuobiSDKBaseOptions>;
+
     constructor(options?: Partial<HuobiSDKBaseOptions>) {
         super();
         if (!options) {
@@ -192,6 +193,7 @@ export class HuobiSDKBase extends EventEmitter {
                     pong: msg.ping
                 });
             } else if (msg.tick) {
+
                 this.handleMarketWSMessage(msg);
             } else {
                 this.outLogger(`market_ws: on message ${text}`);
