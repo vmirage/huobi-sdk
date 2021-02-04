@@ -23,13 +23,14 @@ export class CacheSockett{
         });
     }
     checkLive() {
-        if (Date.now() - this.id > 1000 * 60 * 10) {
+        if (typeof this.id === 'number' && (Date.now() - this.id) > (1000 * 60 * 10)) {
             this.ws.emit("error", {
                 error: "error",
                 message: "ws 重启",
                 type: "error",
                 target: this.ws.wss
             });
+            this.ws.close();
             setTimeout(() => {
                 this.reStart();
             }, 1000);
