@@ -48,7 +48,7 @@ export class HuobiSDK extends HuobiSDKBase{
 
     getSocket = (type: 'market_cache_ws' | 'account_cache_ws' | 'market_ws' | 'account_ws') => {
         return new Promise<CacheSockett & Sockett>((resolve, reject) => {
-            if (this['market_cache_ws'] === undefined || this['market_ws'] === undefined) {
+            if ((this['market_cache_ws'] === undefined || this['market_ws'] === undefined) && type.includes('market')) {
                 const market_ws = this.createMarketWS();
                 if (this.market_cache_ws == undefined) {
                     this.market_cache_ws = new CacheSockett(market_ws);
@@ -67,7 +67,7 @@ export class HuobiSDK extends HuobiSDKBase{
                     });
                 }
             }
-            if (this['account_cache_ws'] === undefined || this['account_ws'] === undefined) {
+            if ((this['account_cache_ws'] === undefined || this['account_ws'] === undefined) && type.includes('account')) {
                 const account_ws = this.createAccountWS();
                 if (this.account_cache_ws === undefined) {
                     this.account_cache_ws = new CacheSockett(account_ws);
@@ -75,6 +75,7 @@ export class HuobiSDK extends HuobiSDKBase{
                 if (account_ws.isOpen()) {
                     resolve(this[type]  || HuobiSDKBase[type]);
                 } else {
+  
                     this.on('account_ws.open', () => {
                         resolve(this[type]  || HuobiSDKBase[type]);
                     });
