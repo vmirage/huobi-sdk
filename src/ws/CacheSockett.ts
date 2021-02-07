@@ -3,19 +3,55 @@ import Sockett from 'Sockett';
 export class CacheSockett{
     cache: Record<string, string[]> = {};
     ws: Sockett;
+    id: number;
     constructor(ws: Sockett) {
         this.ws = ws;
+        ws.on('open', () => {
+            this.checkLive();
+            // this.cache = {};
+        });
+        ws.on('message', () => {
+            this.id = Date.now();
+        });
     }
     reStart(ws = this.ws) {
         this.ws = ws;
+        ws.close();
         ws.open();
         ws.on('open', () => {
-            const list = Object.keys(this.cache);
-            list.forEach((str) => {
-                this.ws.json(JSON.parse(str));
-            });
+            // const list = Object.keys(this.cache);
+            // list.forEach((str) => {
+            //     this.ws.send(str);
+            // });
+            // this.checkLive();
             // this.cache = {};
         });
+        ws.on('message', () => {
+            this.id = Date.now();
+        });
+    }
+    checkLive() {
+
+        if (typeof this.id === 'number' && (Date.now() - this.id) > (1000 * 60 * 10)) {
+            const list = Object.keys(this.cache);
+            list.forEach((str) => {
+                this.ws.send(str.replace('sub', 'unsub'));
+            });
+            this.ws.close();
+            this.ws.emit("error", {
+                error: "error",
+                message: "ws 重启",
+                type: "error",
+                target: this.ws.wss
+            });
+            // setTimeout(() => {
+            //     this.reStart();
+            // }, 1000);
+            return;
+        }
+        setTimeout(() => {
+            this.checkLive();
+        }, 1000 * 30);
     }
     checkCache() {
         if (!this.cache) {

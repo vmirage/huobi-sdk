@@ -61,7 +61,7 @@ export function signature(
         SignatureMethod: "HmacSHA256",
         SignatureVersion: "2",
         Timestamp: timestamp,
-        ...data,
+        ...data
     }
 
     Object.assign(body, {
