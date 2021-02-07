@@ -3,7 +3,7 @@
  */
 export type Period = "1min" | "5min" | "15min" | "30min" | "60min" | "1day" | "1mon" | "1week" | "1year";
 
-export type TradeType = 'buy' | 'sell';
+export type TradeType = 'buy' | 'sell' | 'both';
 
 export interface BalanceItem{
     currency: string;

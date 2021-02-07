@@ -137,12 +137,15 @@ export class HuobiSDK extends HuobiSDKBase{
      * @param side
      * @param size
      */
-    getOpenOrders(symbol: string, side: TradeType | null = null, size?: number) {
+    getOpenOrders(symbol: string, optional: {
+        side?: TradeType;
+        size?: number;
+    }) {
         const path = `/v1/order/openOrders`;
         return this.auth_get<Record<string, any>[]>(`${path}`, {
+            'account-id': this.spot_account_id,
             symbol,
-            side,
-            size
+            ...optional
         });
     }
     getOrders(symbol: string, states = 'filled,partial-filled,canceled') {
