@@ -16,13 +16,15 @@ export class CacheSockett{
     }
     reStart(ws = this.ws) {
         this.ws = ws;
-        ws.close();
+        // ws.close();
         ws.open();
         ws.on('open', () => {
-            // const list = Object.keys(this.cache);
-            // list.forEach((str) => {
-            //     this.ws.send(str);
-            // });
+            setTimeout(() => {
+                const list = Object.keys(this.cache);
+                list.forEach((str) => {
+                    this.ws.send(str);
+                });
+            }, 1000 * 10);
             // this.checkLive();
             // this.cache = {};
         });
