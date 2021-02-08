@@ -19,8 +19,11 @@ export class CacheSockett{
         // ws.close();
         ws.open();
         ws.on('open', () => {
+            const list = Object.keys(this.cache);
+            list.forEach((str) => {
+                this.ws.send(str.replace('sub', 'unsub'));
+            });
             setTimeout(() => {
-                const list = Object.keys(this.cache);
                 list.forEach((str) => {
                     this.ws.send(str);
                 });
