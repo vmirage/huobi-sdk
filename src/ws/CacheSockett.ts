@@ -18,11 +18,12 @@ export class CacheSockett{
         this.ws = ws;
         // ws.close();
         ws.open();
-        ws.on('open', () => {
+        ws.once('open', () => {
             const list = Object.keys(this.cache);
-            list.forEach((str) => {
-                this.ws.send(str.replace('sub', 'unsub'));
-            });
+
+            // list.forEach((str) => {
+            //     this.ws.send(str.replace('sub', 'unsub'));
+            // });
             setTimeout(() => {
                 list.forEach((str) => {
                     this.ws.send(str);
