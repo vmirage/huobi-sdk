@@ -55,7 +55,7 @@ export class HuobiSDK extends HuobiSDKBase{
 
                     this.market_cache_ws.ws.on('close', () => {
                         this.outLogger('close.reStart');
-                        this.market_cache_ws.reStart();
+                        (this.market_cache_ws as CacheSockett).reStart();
                     });
                 }
                 if (market_ws.isOpen()) {
