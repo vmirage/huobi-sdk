@@ -55,13 +55,13 @@ export class HuobiSDK extends HuobiSDKBase{
 
                     this.market_cache_ws.ws.on('close', () => {
                         this.outLogger('close.reStart');
-                        (this.market_cache_ws as any).reStart();
+                        this.market_cache_ws.reStart();
                     });
                 }
                 if (market_ws.isOpen()) {
                     resolve(this[type] || HuobiSDKBase[type]);
                 } else {
-                    this.on('market_ws.open', () => {
+                    this.once('market_ws.open', () => {
                         resolve(this[type] || HuobiSDKBase[type]);
                     });
                 }
@@ -75,7 +75,7 @@ export class HuobiSDK extends HuobiSDKBase{
                     resolve(this[type]  || HuobiSDKBase[type]);
                 } else {
 
-                    this.on('account_ws.open', () => {
+                    this.once('account_ws.open', () => {
                         resolve(this[type]  || HuobiSDKBase[type]);
                     });
                 }
