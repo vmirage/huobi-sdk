@@ -91,7 +91,7 @@ export class CacheSockett{
      * 退阅行为会删除缓存
      * @param data
      */
-    async upsub(data: {sub?: string, unsub?: string, id: string}, id?: string) {
+    upsub(data: {sub?: string, unsub?: string, id: string}, id?: string) {
         const _id = id ? id : 'system';
         const dataStr: string = JSON.stringify(data);
         if (data.unsub === undefined) {

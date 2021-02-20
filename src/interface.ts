@@ -40,19 +40,26 @@ export interface ContractInfo {
     "create_date": string,
     "contract_status": number
 }
-
-export interface OrderInfo {
+export interface OrderBase {
     'filled-cash-amount': number;
     'filled-fees': number;
     amount: number;
-    'client-order-id': string;
     'account-id': number;
     'filled-amount': number;
-    source: 'api';
+    source: string;
     symbol: string;
     price: number;
     'created-at': number;
     id: number;
     state: string;
     type: 'buy-limit' | 'sell-limit'
+}
+export interface OpenOrderInfo extends OrderBase {
+    amount: number;
+    'client-order-id': string;
+}
+export interface HistoryOrderDetail extends OrderBase {
+    'client-order-id': string,
+    'finished-at': 1613793605672,
+    'canceled-at': 0
 }

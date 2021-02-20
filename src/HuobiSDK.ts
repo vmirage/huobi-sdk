@@ -1,7 +1,7 @@
 import { HuobiSDKBase, HuobiSDKBaseOptions } from "./HuobiSDKBase";
-import { SymbolInfo, TradeType, ContractInfo, Period, BalanceItem, OrderInfo } from "./interface";
+import { SymbolInfo, TradeType, ContractInfo, Period, BalanceItem, OpenOrderInfo, HistoryOrderDetail } from "./interface";
 import { CacheSockett } from "./ws/CacheSockett";
-import { WS_SUB } from "./ws/ws.cmd";
+import { WS_SUB, WS_UNSUB } from "./ws/ws.cmd";
 import { CandlestickIntervalEnum } from './constant';
 import { WS_REQ_V2 } from "./ws/ws.cmd.v2";
 import Sockett from "sockett";
@@ -141,7 +141,7 @@ export class HuobiSDK extends HuobiSDKBase{
         size?: number;
     }) {
         const path = `/v1/order/openOrders`;
-        return this.auth_get<OrderInfo[]>(`${path}`, {
+        return this.auth_get<OpenOrderInfo[]>(`${path}`, {
             'account-id': this.spot_account_id,
             symbol,
             ...optional
@@ -156,7 +156,7 @@ export class HuobiSDK extends HuobiSDKBase{
     }
     getOrder(orderId: string) {
         const path = `/v1/order/orders/${orderId}`;
-        return this.auth_get<any>(`${path}`);
+        return this.auth_get<HistoryOrderDetail>(`${path}`);
     }
     /**
      * 下单(现货)
@@ -219,6 +219,12 @@ export class HuobiSDK extends HuobiSDKBase{
         }
         this.addEvent(subMessage.sub, subscription);
     }
+    async upMarketDepth({symbol, step, id}: {symbol: string, step?: string, id?: string}, subscription?: () => void) {
+        const subMessage = WS_UNSUB.depth(symbol, step);
+        const market_cache_ws = await this.getSocket('market_cache_ws');
+        market_cache_ws.upsub(subMessage, id);
+        // this.once(subMessage.unsub, subscription);
+    }
     async subMarketKline({symbol, period, id}: {symbol: string, period: CandlestickIntervalEnum | Period, id?: string}, subscription?: (data: MarketMessageData) => void) {
         const subMessage = WS_SUB.kline(symbol, period);
         const market_cache_ws = await this.getSocket('market_cache_ws');
@@ -226,6 +232,13 @@ export class HuobiSDK extends HuobiSDKBase{
             market_cache_ws.sub(subMessage, id);
         }
         this.addEvent(subMessage.sub, subscription);
+    }
+
+    async upMarketKline({symbol, period, id}: {symbol: string, period: CandlestickIntervalEnum | Period, id?: string}, subscription?: () => void) {
+        const subMessage = WS_UNSUB.kline(symbol, period);
+        const market_cache_ws = await this.getSocket('market_cache_ws');
+        market_cache_ws.upsub(subMessage, id);
+        // this.once(subMessage.unsub, subscription);
     }
     async subMarketTrade({symbol, id}: {symbol: string, id?: string}, subscription?: (data: MarketMessageData) => void) {
         const subMessage = WS_SUB.tradeDetail(symbol);
@@ -235,7 +248,12 @@ export class HuobiSDK extends HuobiSDKBase{
         }
         this.addEvent(subMessage.sub, subscription);
     }
-
+    async upMarketTrade({symbol, id}: {symbol: string, id?: string}, subscription?: () => void) {
+        const subMessage = WS_UNSUB.tradeDetail(symbol);
+        const market_cache_ws = await this.getSocket('market_cache_ws');
+        market_cache_ws.upsub(subMessage, id);
+        // this.once(subMessage.unsub, subscription);
+    }
     async subAuth(subscription?: (data: Record<string, any>) => void) {
         const account_ws = await this.getSocket('account_ws');
         account_ws.json(

@@ -49,6 +49,49 @@ export const WS_SUB = {
         }
     }
 }
+export const WS_UNSUB = {
+    /**
+     * k线订阅
+     * @param param0
+     */
+    kline (symbol: string, period: CandlestickIntervalEnum | Period) {
+        return {
+            "unsub": `market.${symbol}.kline.${period}`,
+            "id": `sub_${symbol}_${period}`
+        }
+    },
+    /**
+     * 市场深度行情数据
+     * @param symbol
+     * @param step 合并
+     */
+    depth(symbol: string, step = 'step0') {
+        return {
+            "unsub": `market.${symbol}.depth.${step}`,
+            "id": `sub_${symbol}_${step}`
+        }
+    },
+    /**
+     *  订阅 Market Detail 数据
+     * @param symbol
+     */
+    marketDetail(symbol: string) {
+        return{
+            "unsub": `market.${symbol}.detail`,
+            "id": `sub_${symbol}`
+        }
+    },
+    /**
+     * 交易数据
+     * @param symbol
+     */
+    tradeDetail(symbol: string) {
+        return {
+            "unsub": `market.${symbol}.trade.detail`,
+            "id": `sub_${symbol}`
+        }
+    }
+}
 export const WS_REQ = {
     auth(accessKey: string, secretKey: string, WS_URL: string) {
         return {
