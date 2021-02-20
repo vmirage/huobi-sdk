@@ -30,7 +30,7 @@ export interface SymbolInfo {
   'buy-market-max-order-value': number;
   'api-trading': string;
 }
-  export interface ContractInfo {
+export interface ContractInfo {
     "symbol": string,
     "contract_code": string,
     "contract_type": string,
@@ -39,4 +39,20 @@ export interface SymbolInfo {
     "delivery_date": string,
     "create_date": string,
     "contract_status": number
+}
+
+export interface OrderInfo {
+    'filled-cash-amount': number;
+    'filled-fees': number;
+    amount: number;
+    'client-order-id': string;
+    'account-id': number;
+    'filled-amount': number;
+    source: 'api';
+    symbol: string;
+    price: number;
+    'created-at': number;
+    id: number;
+    state: string;
+    type: 'buy-limit' | 'sell-limit'
 }

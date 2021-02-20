@@ -1,5 +1,5 @@
 import { HuobiSDKBase, HuobiSDKBaseOptions } from "./HuobiSDKBase";
-import { SymbolInfo, TradeType, ContractInfo, Period, BalanceItem } from "./interface";
+import { SymbolInfo, TradeType, ContractInfo, Period, BalanceItem, OrderInfo } from "./interface";
 import { CacheSockett } from "./ws/CacheSockett";
 import { WS_SUB } from "./ws/ws.cmd";
 import { CandlestickIntervalEnum } from './constant';
@@ -141,7 +141,7 @@ export class HuobiSDK extends HuobiSDKBase{
         size?: number;
     }) {
         const path = `/v1/order/openOrders`;
-        return this.auth_get<Record<string, any>[]>(`${path}`, {
+        return this.auth_get<OrderInfo[]>(`${path}`, {
             'account-id': this.spot_account_id,
             symbol,
             ...optional
@@ -164,10 +164,11 @@ export class HuobiSDK extends HuobiSDKBase{
      * @param type
      * @param amount
      * @param price
+     * @return orderId
      */
     order(symbol: string, type: string, amount: number, price: number) {
         const path = '/v1/order/orders/place'
-        return this.auth_post<any>(`${path}`, {
+        return this.auth_post<string>(`${path}`, {
             "account-id": this.spot_account_id,
             symbol,
             type,
