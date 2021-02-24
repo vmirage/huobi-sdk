@@ -43,11 +43,12 @@ const hbsdk = new HuobiSDK({
 
 // 需要先执行(只需执行一次)，才能调用 钱包、下单 等接口
 hbsdk.getAccountId().then(() => {
-
+    // 查余额
+    hbsdk.getAccountBalance().then((data) => {
+        console.log(data.list)
+    });
 });
 
-// 查余额
-hbsdk.getAccountBalance(data => console.log(data.list));
 
 // 下单
 hbsdk.order('btcusdt', 'buy-limit', 0.001, 38000);
