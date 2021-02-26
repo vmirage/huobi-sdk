@@ -4,6 +4,7 @@ export class CacheSockett{
     cache: Record<string, string[]> = {};
     ws: Sockett;
     id: number;
+    shouldCheckLive: boolean;
     constructor(ws: Sockett) {
         this.ws = ws;
     }
@@ -15,16 +16,21 @@ export class CacheSockett{
             list.forEach((str) => {
                 this.ws.send(str);
             });
-            // this.checkLive();
+            this.shouldCheckLive = true;
+            this.checkLive();
             // this.cache = {};
         });
-        // ws.on('message', () => {
-        //     this.id = Date.now();
-        // });
+        ws.once('close', () => {
+            this.ws.off('message', this.updateId);
+            this.shouldCheckLive = false;
+        })
+        ws.on('message', this.updateId);
     }
     checkLive() {
-
-        if (typeof this.id === 'number' && (Date.now() - this.id) > (1000 * 60 * 10)) {
+        if (!this.shouldCheckLive) {
+            return;
+        }
+        if (typeof this.id === 'number' && (Date.now() - this.id) > (1000 * 60 * 30)) {
             const list = Object.keys(this.cache);
             list.forEach((str) => {
                 this.ws.send(str.replace('sub', 'unsub'));
@@ -58,6 +64,9 @@ export class CacheSockett{
                 }
             }
         }
+    }
+    updateId = () => {
+        this.id = Date.now();
     }
     hasCache(data) {
         const dataStr = JSON.stringify(data);
