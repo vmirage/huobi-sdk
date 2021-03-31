@@ -1,5 +1,5 @@
 import { HuobiSDKBase, HuobiSDKBaseOptions } from "./HuobiSDKBase";
-import { SymbolInfo, TradeType, ContractInfo, Period, BalanceItem, OpenOrderInfo, HistoryOrderDetail } from "./interface";
+import { SymbolInfo, TradeType, ContractInfo, Period, BalanceItem, OpenOrderInfo, HistoryOrderDetail, ContractType } from "./interface";
 import { CacheSockett } from "./ws/CacheSockett";
 import { WS_SUB, WS_UNSUB } from "./ws/ws.cmd";
 import { CandlestickIntervalEnum } from './constant';
@@ -24,7 +24,7 @@ export class HuobiSDK extends HuobiSDKBase{
     spot_account_id: number;
     market_cache_ws?: CacheSockett;
     account_cache_ws?: CacheSockett;
-
+    futures_cache_ws?: CacheSockett;
     /**
      * huobi sdk 包含rest api, 行情ws, 账户与订单ws
      * @param parameters
@@ -46,7 +46,7 @@ export class HuobiSDK extends HuobiSDKBase{
         super.setOptions(options);
     }
 
-    getSocket = (type: 'market_cache_ws' | 'account_cache_ws' | 'market_ws' | 'account_ws') => {
+    getSocket = (type: 'market_cache_ws' | 'account_cache_ws' | 'market_ws' | 'account_ws' | 'futures_cache_ws') => {
         return new Promise<CacheSockett & Sockett>((resolve, reject) => {
             if ((this['market_cache_ws'] === undefined || this['market_ws'] === undefined) && type.includes('market')) {
                 const market_ws = this.createMarketWS();
@@ -72,6 +72,21 @@ export class HuobiSDK extends HuobiSDKBase{
                     this.account_cache_ws = new CacheSockett(account_ws);
                 }
                 if (account_ws.isOpen()) {
+                    resolve(this[type]  || HuobiSDKBase[type]);
+                } else {
+
+                    this.once('account_ws.open', () => {
+                        resolve(this[type]  || HuobiSDKBase[type]);
+                    });
+                }
+            }
+
+            if ((this['futures_cache_ws'] === undefined || this['futures_ws'] === undefined) && type.includes('futures')) {
+                const futures_ws = this.createFuturesWS();
+                if (this.futures_cache_ws === undefined) {
+                    this.futures_cache_ws = new CacheSockett(futures_ws);
+                }
+                if (futures_ws.isOpen()) {
                     resolve(this[type]  || HuobiSDKBase[type]);
                 } else {
 
@@ -160,16 +175,74 @@ export class HuobiSDK extends HuobiSDKBase{
     }
     /**
      * 获取合约信息
-     * @param symbol 
-     * @param contract_type 
-     * @returns 
+     * "BTC_CQ"表示BTC当季合约,
+     * @param symbol
+     * @param contract_type
+     * @returns
      */
-    getContractMarketDetailMerged(symbol: string, contract_type?: string) {
-        const path = `/v1/contract_contract_info`;
-        return this.auth_get_contract(path, {
-            symbol,
-            contract_type,
+    getContractMarketDetailMerged(symbol: string) {
+        const path = `/market/detail/merged`;
+        return this._request<{
+            ch: string,
+            status: string,
+            tick: {
+                amount: string,
+                ask: number[],
+                bid: number[],
+                close: string,
+                count: number,
+                high: number,
+                id: number,
+                low: number,
+                open: number,
+                ts: number,
+                vol: number }
+            ts: number
+        }>(`${this.options.url.contract}${path}`, {
+            searchParams: {
+                symbol,
+            }
         })
+    }
+    /**
+     *  合约k线数据
+     * @param symbol
+     */
+    getContractMarketHistoryKline(symbol: string, period: Period, size: number) {
+        const path = `/market/history/kline`;
+        return this._request<any>(`${this.options.url.contract}${path}`, {
+            searchParams: {
+                period: symbol,
+                size: period,
+                symbol: size
+            }
+        });
+    }
+    /**
+     * 获取用户持仓信息
+     * @param symbol
+     */
+    getContractPositionInfo(symbol: string) {
+        const path = `/api/v1/contract_position_info`;
+        return this.auth_post_contract<{
+            "symbol": string,
+            "contract_code": string,
+            "contract_type": ContractType,
+            "volume": number,
+            "available": number,
+            "frozen": number,
+            "cost_open":number,
+            "cost_hold": number,
+            "profit_unreal": number,
+            "profit_rate": number,
+            "lever_rate": number,
+            "position_margin": number,
+            "direction": "sell" | 'buy',
+            "profit": number,
+            "last_price": number
+        }[]>(path, {
+            period: symbol,
+        });
     }
     /**
      * 下单(现货)
@@ -189,6 +262,35 @@ export class HuobiSDK extends HuobiSDKBase{
             price,
         });
     }
+    /**
+     * 合约下单
+     *
+     * 开多：买入开多(direction用buy、offset用open)
+     *
+     * 平多：卖出平多(direction用sell、offset用close)
+     *
+     * 开空：卖出开空(direction用sell、offset用open)
+     *
+     * 平空：买入平空(direction用buy、offset用close)
+     *
+     */
+    contractOrder(params: {
+        symbol: string;
+        contract_type: ContractType;
+        price: number | string;
+        volume: number;
+        direction: 'buy' | 'sell';
+        offset: 'open' | 'close';
+        /**
+         * 开仓倍数
+         */
+        lever_rate: number;
+        order_price_type: 'limit'
+    }) {
+        const path = '/api/v1/contract_order'
+        return this.auth_post_contract<string>(`${path}`, params);
+    }
+
     cancelOrder(orderId: string) {
         const path = `/v1/order/orders/${orderId}/submitcancel`;
         return this.auth_post(path, {
@@ -289,6 +391,15 @@ export class HuobiSDK extends HuobiSDKBase{
         }
         this.addEvent('accounts.update', subscription);
     }
+
+    // async subMarketDepth({symbol, step, id}: {symbol: string, step?: string, id?: string}, subscription?: (data: MarketMessageData<{bids: any[], asks: any[]}>) => void) {
+    //     const subMessage = WS_SUB.depth(symbol, step);
+    //     const market_cache_ws = await this.getSocket('market_cache_ws');
+    //     if (!market_cache_ws.hasCache(subMessage)) {
+    //         market_cache_ws.sub(subMessage, id);
+    //     }
+    //     this.addEvent(subMessage.sub, subscription);
+    // }
 }
 
 export default HuobiSDK;

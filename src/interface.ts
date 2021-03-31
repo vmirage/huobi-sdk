@@ -5,6 +5,8 @@ export type Period = "1min" | "5min" | "15min" | "30min" | "60min" | "1day" | "1
 
 export type TradeType = 'buy' | 'sell' | 'both';
 
+export type ContractType = 'this_week' | 'next_week' | 'quarter' | 'next_quarter'
+
 export interface BalanceItem{
     currency: string;
     type: string;
