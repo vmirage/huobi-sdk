@@ -35,6 +35,10 @@ export interface HuobiSDKBaseOptions {
          * 需要签名(默认使用V2)
          */
         account_ws?: string;
+        /**
+         * 合约
+         */
+        contract?: string;
     };
     socket?: {
         timeout?: number;
@@ -147,6 +151,30 @@ export class HuobiSDKBase extends EventEmitter {
         });
     }
 
+    auth_get_contract = <T = any>(
+        path: string,
+        params: Record<string, any> = {} as Record<string, any>
+    ) => {
+        if (!this.options.url.contract) {
+            return Promise.reject('未设置options.url.contract')
+        }
+        const PATH = `${this.options.url.contract}${path}`;
+        const { accessKey, secretKey } = this.options;
+
+        return this._request<T>(PATH, {
+            method: "GET",
+            searchParams: signature("GET", PATH, accessKey, secretKey, params)
+        });
+    }
+    auth_post_contract = <T = any>(path: string, data: Record<string, any>) => {
+        const PATH = `${this.options.url.contract}${path}`;
+        const { accessKey, secretKey } = this.options;
+        return this._request<T>(PATH, {
+            method: "POST",
+            searchParams: signature("POST", PATH, accessKey, secretKey, data),
+            json: data
+        });
+    }
     errLogger = (msg: string, ...arg: any[]) => {
         if (typeof this.options.errLogger === "function") {
             this.options.errLogger(msg, ...arg);
