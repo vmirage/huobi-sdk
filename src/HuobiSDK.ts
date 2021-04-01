@@ -173,14 +173,33 @@ export class HuobiSDK extends HuobiSDKBase{
         const path = `/v1/order/orders/${orderId}`;
         return this.auth_get<HistoryOrderDetail>(`${path}`);
     }
+   
     /**
+     * 下单(现货)
+     * @param symbol
+     * @param type
+     * @param amount
+     * @param price
+     * @return orderId
+     */
+    order(symbol: string, type: string, amount: number, price: number) {
+        const path = '/v1/order/orders/place'
+        return this.auth_post<string>(`${path}`, {
+            "account-id": this.spot_account_id,
+            symbol,
+            type,
+            amount,
+            price,
+        });
+    }
+     /**
      * 获取合约信息
      * "BTC_CQ"表示BTC当季合约,
      * @param symbol
      * @param contract_type
      * @returns
      */
-    getContractMarketDetailMerged(symbol: string) {
+      contractMarketDetailMerged(symbol: string) {
         const path = `/market/detail/merged`;
         return this._request<{
             ch: string,
@@ -208,7 +227,7 @@ export class HuobiSDK extends HuobiSDKBase{
      *  合约k线数据
      * @param symbol
      */
-    getContractMarketHistoryKline(symbol: string, period: Period, size: number) {
+    contractMarketHistoryKline(symbol: string, period: Period, size: number) {
         const path = `/market/history/kline`;
         return this._request<any>(`${this.options.url.contract}${path}`, {
             searchParams: {
@@ -222,7 +241,7 @@ export class HuobiSDK extends HuobiSDKBase{
      * 获取用户持仓信息
      * @param symbol
      */
-    getContractPositionInfo(symbol: string) {
+    contractPositionInfo(symbol: string) {
         const path = `/api/v1/contract_position_info`;
         return this.auth_post_contract<{
             "symbol": string,
@@ -244,24 +263,7 @@ export class HuobiSDK extends HuobiSDKBase{
             period: symbol,
         });
     }
-    /**
-     * 下单(现货)
-     * @param symbol
-     * @param type
-     * @param amount
-     * @param price
-     * @return orderId
-     */
-    order(symbol: string, type: string, amount: number, price: number) {
-        const path = '/v1/order/orders/place'
-        return this.auth_post<string>(`${path}`, {
-            "account-id": this.spot_account_id,
-            symbol,
-            type,
-            amount,
-            price,
-        });
-    }
+
     /**
      * 合约下单
      *
@@ -315,17 +317,29 @@ export class HuobiSDK extends HuobiSDKBase{
     /**
      * 获取当前可用合约总持仓量
      */
-    contractOpenInterest() {
-        return this.auth_get('/api/v1/contract_open_interest');
+    contractOpenInterest(symbol: string, contract_type: ContractType) {
+        const path = `/api/v1/contract_open_interest`;
+        return this._request<any>(`${this.options.url.contract}${path}`, {
+            searchParams: {
+                symbol: symbol,
+                contract_type,
+            }
+        });
     }
     /**
      * 获取合约用户账户信息
      */
     contractAccountInfo(symbol: string) {
         const path = `/api/v1/contract_account_info`;
-        return this.auth_post( path, {symbol: symbol});
+        return this.auth_post_contract( path, {symbol: symbol});
     }
-
+    /**
+     * 获取合约订单信息
+     */
+    contractOrderInfo(symbol: string) {
+        const path = `/api/v1/contract_order_info`;
+        return this.auth_post_contract(path, {symbol: symbol});
+    }
     async subMarketDepth({symbol, step, id}: {symbol: string, step?: string, id?: string}, subscription?: (data: MarketMessageData<{bids: any[], asks: any[]}>) => void) {
         const subMessage = WS_SUB.depth(symbol, step);
         const market_cache_ws = await this.getSocket('market_cache_ws');
