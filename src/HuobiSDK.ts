@@ -41,7 +41,14 @@ export class HuobiSDK extends HuobiSDKBase{
         if (typeof callback === 'function') {
             this.on(event, callback);
         }
+        // unuse
+        return () => {
+            if (callback) {
+                this.off(event, callback);
+            }
+        }
     }
+
     setOptions = (options: HuobiSDKOptions) => {
         super.setOptions(options);
     }
@@ -173,7 +180,7 @@ export class HuobiSDK extends HuobiSDKBase{
         const path = `/v1/order/orders/${orderId}`;
         return this.auth_get<HistoryOrderDetail>(`${path}`);
     }
-   
+
     /**
      * 下单(现货)
      * @param symbol
@@ -346,7 +353,7 @@ export class HuobiSDK extends HuobiSDKBase{
         if (!market_cache_ws.hasCache(subMessage)) {
             market_cache_ws.sub(subMessage, id);
         }
-        this.addEvent(subMessage.sub, subscription);
+        return this.addEvent(subMessage.sub, subscription);
     }
     async upMarketDepth({symbol, step, id}: {symbol: string, step?: string, id?: string}, subscription?: () => void) {
         const subMessage = WS_UNSUB.depth(symbol, step);
@@ -360,7 +367,7 @@ export class HuobiSDK extends HuobiSDKBase{
         if (!market_cache_ws.hasCache(subMessage)) {
             market_cache_ws.sub(subMessage, id);
         }
-        this.addEvent(subMessage.sub, subscription);
+        return this.addEvent(subMessage.sub, subscription);
     }
 
     async upMarketKline({symbol, period, id}: {symbol: string, period: CandlestickIntervalEnum | Period, id?: string}, subscription?: () => void) {
@@ -375,7 +382,7 @@ export class HuobiSDK extends HuobiSDKBase{
         if (!market_cache_ws.hasCache(subMessage)) {
             market_cache_ws.sub(subMessage, id);
         }
-        this.addEvent(subMessage.sub, subscription);
+        return this.addEvent(subMessage.sub, subscription);
     }
     async upMarketTrade({symbol, id}: {symbol: string, id?: string}, subscription?: () => void) {
         const subMessage = WS_UNSUB.tradeDetail(symbol);
