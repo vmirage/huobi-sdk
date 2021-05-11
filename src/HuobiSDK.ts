@@ -180,7 +180,25 @@ export class HuobiSDK extends HuobiSDKBase{
         const path = `/v1/order/orders/${orderId}`;
         return this.auth_get<HistoryOrderDetail>(`${path}`);
     }
-
+    /**
+     * 币币现货转合约
+     * @param currency 币种
+     * @param amount 数量
+     * @param type 从合约账户到现货账户：“futures-to-pro”，从现货账户到合约账户： “pro-to-futures”
+     */
+    futuresTransfer(currency: string, amount: number, type: string) {
+        const path = '/v1/futures/transfer'
+        return this.auth_post<{
+            data: string;
+            status: string;
+            "err-code": string;
+            "err-msg": string;
+        }>(`${path}`, {
+            currency,
+            amount,
+            type,
+        });
+    }
     /**
      * 下单(现货)
      * @param symbol
