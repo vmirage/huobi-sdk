@@ -109,7 +109,9 @@ hbsdk.setOptions({
 - getAccounts [账户信息](https://huobiapi.github.io/docs/spot/v1/cn/#2a0d0be224)
 - getAccountId 默认获取现货的账户id type=spot
 - getAccountBalance [账户余额](https://huobiapi.github.io/docs/spot/v1/cn/#870c0ab88b)
+- futuresTransfer [币币现货账户与合约账户划转](https://huobiapi.github.io/docs/spot/v1/cn/#2f6797c498)
 - getOpenOrders [查询当前未成交订单](https://huobiapi.github.io/docs/spot/v1/cn/#95f2078356)
+- --
 - getOrders [搜索历史订单](https://huobiapi.github.io/docs/spot/v1/cn/#d72a5b49e7)
 - getOrder [查询订单详情](https://huobiapi.github.io/docs/spot/v1/cn/#5f8b337a4c)
 - order [下单](https://huobiapi.github.io/docs/spot/v1/cn/#fd6ce2a756)
@@ -120,7 +122,9 @@ hbsdk.setOptions({
 - contractPriceLimit [获取合约最高限价和最低限价](https://huobiapi.github.io/docs/dm/v1/cn/#025c787500)
 - contractOpenInterest [获取当前可用合约总持仓量](https://huobiapi.github.io/docs/dm/v1/cn/#e30aaa2765)
 - contractAccountInfo [获取合约用户账户信息](https://huobiapi.github.io/docs/dm/v1/cn/#e807c44c06)
-
+- contractMarketHistoryKline [合约K线数据]
+- contractPositionInfo [获取用户持仓信息]
+- contractOrder [合约下单]
 - --
 - subMarketDepth [订阅市场深度行情数据](https://huobiapi.github.io/docs/spot/v1/cn/#8742b7d9f7)
 - subMarketKline [订阅K线](https://huobiapi.github.io/docs/spot/v1/cn/#k-2)
