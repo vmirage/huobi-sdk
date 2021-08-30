@@ -4,8 +4,6 @@ import { signature } from '../utils/signature';
 import { Period } from '../interface'
 import { CandlestickIntervalEnum } from '../constant';
 
-
-
 export const WS_SUB = {
     /**
      * k线订阅

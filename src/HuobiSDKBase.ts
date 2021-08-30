@@ -1,3 +1,4 @@
+import { gunzip } from "zlib";
 import { EventEmitter } from "events";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -43,6 +44,18 @@ export interface HuobiSDKBaseOptions {
          * 期货行情
          */
         futures_ws?: string;
+        /**
+         * swap
+         */
+        swap?: string;
+        /**
+         * swap websocket
+         */
+        swap_ws?: string;
+        /**
+         * swap websocket
+         */
+        swap_notification_ws?: string;
     };
     socket?: {
         timeout?: number;
@@ -67,9 +80,13 @@ export class HuobiSDKBase extends EventEmitter {
     static market_ws?: Sockett;
     static account_ws?: Sockett;
     static futures_ws?: Sockett;
-    static market_ws_status?: 'creating' | 'created'
-    static account_ws_status?: 'creating' | 'created'
-    static futures_ws_status?: 'creating' | 'created'
+    static swap_ws?: Sockett;
+    static swap_notification_ws?: Sockett;
+    static market_ws_status?: 'creating' | 'created';
+    static account_ws_status?: 'creating' | 'created';
+    static futures_ws_status?: 'creating' | 'created';
+    static swap_ws_status?: 'creating' | 'created';
+    static swap_notification_ws_status?: 'creating' | 'created';
     options: Required<HuobiSDKBaseOptions> = {} as Required<HuobiSDKBaseOptions>;
 
     constructor(options?: Partial<HuobiSDKBaseOptions>) {
@@ -79,8 +96,8 @@ export class HuobiSDKBase extends EventEmitter {
         }
         this.setOptions(options);
     }
-    setOptions  (options: Partial<HuobiSDKBaseOptions> = {})  {
-        const {httpOptions, url, socket, ...otherOptions } = options;
+    setOptions(options: Partial<HuobiSDKBaseOptions> = {}) {
+        const { httpOptions, url, socket, ...otherOptions } = options;
 
         Object.assign(this.options, {
             httpOptions: {
@@ -124,19 +141,19 @@ export class HuobiSDKBase extends EventEmitter {
             .catch(err => {
                 this.errLogger(options.method as string, "-", path, err);
             });
-    }
+    };
     request = <T>(path: string, options: HttpOptions): Promise<T> => {
         if (!this.options.url.rest) {
-            return Promise.reject('未设置options.url.rest')
+            return Promise.reject('未设置options.url.rest');
         }
         return this._request<T>(`${this.options.url.rest}${path}`, options);
-    }
+    };
     auth_get = <T = any>(
         path: string,
         params: Record<string, any> = {} as Record<string, any>
     ) => {
         if (!this.options.url.rest) {
-            return Promise.reject('未设置options.url.rest')
+            return Promise.reject('未设置options.url.rest');
         }
         const PATH = `${this.options.url.rest}${path}`;
         const { accessKey, secretKey } = this.options;
@@ -145,7 +162,7 @@ export class HuobiSDKBase extends EventEmitter {
             method: "GET",
             searchParams: signature("GET", PATH, accessKey, secretKey, params)
         });
-    }
+    };
     auth_post = <T = any>(path: string, data: Record<string, any>) => {
         const PATH = `${this.options.url.rest}${path}`;
         const { accessKey, secretKey } = this.options;
@@ -154,14 +171,14 @@ export class HuobiSDKBase extends EventEmitter {
             searchParams: signature("POST", PATH, accessKey, secretKey, data),
             json: data
         });
-    }
+    };
 
     auth_get_contract = <T = any>(
         path: string,
         params: Record<string, any> = {} as Record<string, any>
     ) => {
         if (!this.options.url.contract) {
-            return Promise.reject('未设置options.url.contract')
+            return Promise.reject('未设置options.url.contract');
         }
         const PATH = `${this.options.url.contract}${path}`;
         const { accessKey, secretKey } = this.options;
@@ -170,7 +187,7 @@ export class HuobiSDKBase extends EventEmitter {
             method: "GET",
             searchParams: signature("GET", PATH, accessKey, secretKey, params)
         });
-    }
+    };
     auth_post_contract = <T = any>(path: string, data: Record<string, any>) => {
         const PATH = `${this.options.url.contract}${path}`;
         const { accessKey, secretKey } = this.options;
@@ -179,7 +196,33 @@ export class HuobiSDKBase extends EventEmitter {
             searchParams: signature("POST", PATH, accessKey, secretKey, data),
             json: data
         });
-    }
+    };
+
+    auth_get_swap = <T = any>(
+        path: string,
+        params: Record<string, any> = {} as Record<string, any>
+    ) => {
+        if (!this.options.url.swap) {
+            return Promise.reject('未设置options.url.swap');
+        }
+        const PATH = `${this.options.url.swap}${path}`;
+        const { accessKey, secretKey } = this.options;
+
+        return this._request<T>(PATH, {
+            method: "GET",
+            searchParams: signature("GET", PATH, accessKey, secretKey, params)
+        });
+    };
+    auth_post_swap = <T = any>(path: string, data: Record<string, any>) => {
+        const PATH = `${this.options.url.swap}${path}`;
+        const { accessKey, secretKey } = this.options;
+        return this._request<T>(PATH, {
+            method: "POST",
+            searchParams: signature("POST", PATH, accessKey, secretKey, data),
+            json: data
+        });
+    };
+
     errLogger = (msg: string, ...arg: any[]) => {
         if (typeof this.options.errLogger === "function") {
             this.options.errLogger(msg, ...arg);
@@ -189,7 +232,7 @@ export class HuobiSDKBase extends EventEmitter {
             .utcOffset(8)
             .format("YYYY-MM-DD HH:mm:ss")}] [ERROR] `;
         console.error(`${prefix} ${msg}`, ...arg);
-    }
+    };
     outLogger = (msg: string, ...arg: any[]) => {
         if (typeof this.options.outLogger === "function") {
             this.options.outLogger(msg, ...arg);
@@ -200,7 +243,7 @@ export class HuobiSDKBase extends EventEmitter {
             .format("YYYY-MM-DD HH:mm:ss")}] [INFO] `;
 
         console.log(`${prefix} ${msg}`, ...arg);
-    }
+    };
     createMarketWS() {
 
         if (HuobiSDKBase.market_ws) {
@@ -211,7 +254,7 @@ export class HuobiSDKBase extends EventEmitter {
         HuobiSDKBase.market_ws = new Sockett(this.options.url.market_ws as string, {
             ...this.options.socket
         });
-        HuobiSDKBase.market_ws.on('open',  () => {
+        HuobiSDKBase.market_ws.on('open', () => {
             this.emit('market_ws.open');
             this.outLogger(`${this.options.url.market_ws} open`);
         });
@@ -246,7 +289,7 @@ export class HuobiSDKBase extends EventEmitter {
         return HuobiSDKBase.market_ws;
     }
     handleMarketWSMessage(msg) {
-        if(!msg.ch) {
+        if (!msg.ch) {
             return;
         }
         const [type, symbol, channel, other] = msg.ch.split('.');
@@ -257,9 +300,9 @@ export class HuobiSDKBase extends EventEmitter {
             ch: msg.ch,
             channel: channel,
             symbol,
-        }
+        };
 
-        switch(channel) {
+        switch (channel) {
             case 'depth':
                 this.emit(`market.${symbol}.depth.${other}`, commonData);
                 break;
@@ -280,7 +323,7 @@ export class HuobiSDKBase extends EventEmitter {
         HuobiSDKBase.account_ws = new Sockett(this.options.url.account_ws as string, {
             ...this.options.socket
         });
-        HuobiSDKBase.account_ws.on('open',  () => {
+        HuobiSDKBase.account_ws.on('open', () => {
             this.emit('account_ws.open');
             this.outLogger(`${this.options.url.account_ws} open`);
         });
@@ -323,7 +366,7 @@ export class HuobiSDKBase extends EventEmitter {
         HuobiSDKBase.futures_ws = new Sockett(this.options.url.futures_ws as string, {
             ...this.options.socket
         });
-        HuobiSDKBase.futures_ws.on('open',  () => {
+        HuobiSDKBase.futures_ws.on('open', () => {
             this.emit('futures_ws.open');
             this.outLogger(`${this.options.url.futures_ws} open`);
         });
@@ -358,19 +401,125 @@ export class HuobiSDKBase extends EventEmitter {
         });
         return HuobiSDKBase.futures_ws;
     }
+    // createSwapWS() {
+    //     if (HuobiSDKBase.swap_ws) {
+    //         return HuobiSDKBase.swap_ws;
+    //     }
+
+    //     HuobiSDKBase.swap_ws = new Sockett(this.options.url.swap_ws as string, {
+    //         ...this.options.socket
+    //     });
+    //     HuobiSDKBase.swap_ws.on('open', () => {
+    //         this.emit('swap_ws.open');
+    //         this.outLogger(`${this.options.url.swap_ws} open`);
+    //     });
+    //     HuobiSDKBase.swap_ws.on("message", ev => {
+    //         if (typeof ev.data !== 'string') {
+    //             this.outLogger(`swap_ws: !ev.data ${ev.data}`);
+    //         }
+    //         const msg = JSON.parse(ev.data as string);
+    //         if (msg.action === 'ping') {
+    //             (HuobiSDKBase.swap_ws as Sockett).json({
+    //                 action: "pong",
+    //                 data: {
+    //                     ts: msg.data.ts // 使用Ping消息中的ts值
+    //                 }
+    //             });
+    //         } else if (msg.data) {
+    //             this.handleAccountWSMessage(msg);
+    //         } else {
+    //             this.outLogger(`swap_ws: on message ${JSON.stringify(msg)}`);
+    //         }
+    //     });
+    //     HuobiSDKBase.swap_ws.on('close', (e) => {
+    //         if (e.code === 1006) {
+    //             this.outLogger(`swap_ws closed:`, 'connect ECONNREFUSED');
+    //         }
+    //         else {
+    //             this.outLogger(`swap_ws closed:`, e.reason, ` code ${e.code}`);
+    //         }
+    //     });
+    //     HuobiSDKBase.swap_ws.on('error', (e) => {
+    //         this.outLogger(`swap_ws  error: `, e.message);
+    //     });
+    //     return HuobiSDKBase.swap_ws;
+    // }
+    createSwapNotificationWS() {
+        if (HuobiSDKBase.swap_notification_ws) {
+            return HuobiSDKBase.swap_notification_ws;
+        }
+
+        HuobiSDKBase.swap_notification_ws = new Sockett(this.options.url.swap_notification_ws as string, {
+            ...this.options.socket
+        });
+        HuobiSDKBase.swap_notification_ws.on('open', () => {
+            this.emit('swap_notification_ws.open');
+            this.outLogger(`${this.options.url.swap_notification_ws} open`);
+        });
+        HuobiSDKBase.swap_notification_ws.on("message", ev => {
+            // if (typeof ev.data !== 'string') {
+            //     this.outLogger(`swap_notification_ws: !ev.data ${ev.data}`);
+            // }            
+            gunzip(ev.data as string, (err, buffer) => {
+                const msg = JSON.parse(buffer.toString());
+                console.log(msg);
+                if (msg.op === 'ping') {
+                    (HuobiSDKBase.swap_notification_ws as Sockett).json({
+                        op: "pong",
+                        ts: msg.ts
+                    });
+                } else if (msg.op) {
+                    this.handleSwapWSMessage(msg);
+                } else {
+                    this.outLogger(`swap_notification_ws: on message ${JSON.stringify(msg)}`);
+                }
+            });
+        });
+        HuobiSDKBase.swap_notification_ws.on('close', (e) => {
+            if (e.code === 1006) {
+                this.outLogger(`swap_notification_ws closed:`, 'connect ECONNREFUSED');
+            }
+            else {
+                this.outLogger(`swap_notification_ws closed:`, e.reason, ` code ${e.code}`);
+            }
+        });
+        HuobiSDKBase.swap_notification_ws.on('reconnect', () => {
+            this.emit('swap_notification_ws.reconnect');
+            this.outLogger(`${this.options.url.swap_notification_ws} reconnect`);
+        });
+        HuobiSDKBase.swap_notification_ws.on('error', (e) => {
+            this.outLogger(`swap_ws  error: `, e.message);
+        });
+        return HuobiSDKBase.swap_notification_ws;
+    }
+
+    handleSwapWSMessage(msg) {
+        switch (msg.op) {
+            case 'auth':
+                this.emit('swap-' + msg.op, msg.data);
+                break;
+            case 'notify':
+                this.emit('swap-' + msg.topic.toLowerCase(), msg);
+                break;
+            default:
+                this.outLogger(`swap_notification_ws: on message ${JSON.stringify(msg)}`);
+                return;
+        }
+    }
+
     handleAccountWSMessage(msg) {
-        if(!msg.ch) {
+        if (!msg.ch) {
             return;
         }
         const [channel] = msg.ch.split('#');
-        switch(channel) {
+        switch (channel) {
             case 'auth':
                 this.emit('auth', msg);
                 break;
             case 'accounts.update':
                 this.emit('accounts.update', msg.data);
                 break;
-            default:return;
+            default: return;
         }
     }
 }

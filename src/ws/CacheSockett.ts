@@ -80,7 +80,7 @@ export class CacheSockett{
      * 订阅行为会缓存起来
      * @param data
      */
-    async sub(data: {sub: string, id: string}, id?: string) {
+    async sub(data: object, id?: string) {
 
         const _id = id ? id : 'system';
         const dataStr = JSON.stringify(data);
@@ -100,10 +100,10 @@ export class CacheSockett{
      * 退阅行为会删除缓存
      * @param data
      */
-    upsub(data: {sub?: string, unsub?: string, id: string}, id?: string) {
+    upsub(data: {op?: string, sub?: string, unsub?: string, id?: string, cid?: string}, id?: string) {
         const _id = id ? id : 'system';
         const dataStr: string = JSON.stringify(data);
-        if (data.unsub === undefined) {
+        if (data.unsub === undefined && data.sub !== undefined) {
             data.unsub = data.sub;
         }
         if (this.cache[dataStr]) {
